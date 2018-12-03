@@ -1,0 +1,74 @@
+on load:
+	loop currently loaded yaml files:
+		loop-value contains "leaf.help"
+		unload yaml loop-value
+	load yaml "plugins/LeafHelp/config.yml" as "leaf.help"
+	if yaml value "HELP.Lines Per Page" from "leaf.help" is not set:
+		set yaml value "HELP.Lines Per Page" from "leaf.help" to 5	
+	if yaml value "HELP.header" from "leaf.help" is not set:
+		set yaml value "HELP.header" from "leaf.help" to "&e✱ &8■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ &e✱"	
+	if yaml list "HELP.lines" from "leaf.help" is not set:
+		set yaml list "HELP.lines" from "leaf.help" to "&f&l» &e/tp [permission:tp.perm]", "&f&l» &e/warp" and "&f&l» &e/lobby"
+	if yaml value "HELP.footer" from "leaf.help" is not set:
+		set yaml value "HELP.footer" from "leaf.help" to "&e✱ &8■■■■■&r &8(&eType &n/help {next-page}&e for next page. &8■■■■■ &e✱"		
+	if yaml value "HELP.footer last page" from "leaf.help" is not set:
+		set yaml value "HELP.footer last page" from "leaf.help" to "&e✱ &8■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ &e✱"			
+	if yaml value "HELP.No Pages" from "leaf.help" is not set:
+		set yaml value "HELP.No Pages" from "leaf.help" to "&7&nNo more pages"			
+	save yaml "leaf.help"
+	
+command help [<number = 1>]:
+	cooldown: 2 seconds
+	cooldown message: &7You used this &3%elapsed time% &7ago, &7Please wait &3%remaining time%.
+	trigger:	
+		loop yaml list "HELP.lines" from "leaf.help":
+			set {_line} to loop-value-1
+			if {_line} contains "[permission:":
+				set {_get} to last element of {_line} split at "[permission:"
+				set {_perm} to first element of {_get} split at "]"
+				replace all "[permission:%{_get}%" with "" in {_line}
+				player has permission {_perm}
+				add {_line} to {_list::*}
+			else:
+				add {_line} to {_list::*}
+		set {_int} to 1
+		set {_page} to 1
+		loop {_list::*}:
+			set {_line::%{_int}%::%{_page}%} to loop-value-1
+			add 1 to {_int}	
+			{_int} = yaml value "HELP.Lines Per Page" from "leaf.help" + 1:		
+				add 1 to {_page}
+				set {_int} to 1
+		if {_line::1::%arg-1%} is not set:
+			send yaml value "HELP.No Pages" from "leaf.help"
+			stop
+		send yaml value "HELP.header" from "leaf.help"	
+		loop yaml value "HELP.Lines Per Page" from "leaf.help" + 1 times:
+			send colored {_line::%loop-number%::%arg-1%}
+		if {_line::1::%arg-1+1%} is set:	
+			set {_footer} to yaml value "HELP.footer" from "leaf.help"
+			replace all "{next-page}" with "%arg-1+1%" in {_footer}
+			send {_footer}
+		if {_line::1::%arg-1+1%} is not set:	
+			send yaml value "HELP.footer last page" from "leaf.help"			
+
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
