@@ -31,11 +31,10 @@ command help [<number = 1>]:
 				add {_line} to {_list::*}
 			else:
 				add {_line} to {_list::*}
-		set {_int} to 1
 		set {_page} to 1
 		loop {_list::*}:
+			add 1 to {_int}
 			set {_line::%{_int}%::%{_page}%} to loop-value-1
-			add 1 to {_int}	
 			{_int} = yaml value "HELP.Lines Per Page" from "leaf.help" + 1:		
 				add 1 to {_page}
 				set {_int} to 1
